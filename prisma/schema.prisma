@@ -1,0 +1,297 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String
+  userRoles UserRole[]
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  fullname     String
+  email        String        @unique
+  hash         String
+  city         String        @default("")
+  ward         String        @default("")
+  district     String        @default("")
+  street       String        @default("")
+  avatar       String        @default("")
+  phone        String        @default("")
+  // orders       Order[]
+  votes        Vote[]
+  repVotes     RepVote[]
+  productUsers ProductUser[]
+  comments     Comment[]
+  repComments  RepComment[]
+  userRoles    UserRole[]
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  roleId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id])
+}
+
+model CategoryType {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  name       String     @default("Product List")
+  categories Category[]
+}
+
+model Category {
+  id                  Int               @id @default(autoincrement())
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  title               String
+  name                String            @default("")
+  description         String            @default("")
+  isDisplayedOnHeader Boolean           @default(false)
+  slug                String            @unique
+  thumbnail           String            @default("")
+  categoryTypeId      Int?
+  categoryType        CategoryType?     @relation(fields: [categoryTypeId], references: [id])
+  parentId            Int?              @map("categoryId")
+  parent              Category?         @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children            Category[]        @relation("CategoryToCategory")
+  products            Product[]
+  productCategories   ProductCategory[]
+}
+
+model ProductCategory {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  categoryId Int
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+}
+
+model Product {
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  name              String
+  price             Int
+  newPrice          Int
+  thumbnail         String
+  slug              String            @unique
+  categoryId        Int
+  category          Category          @relation(fields: [categoryId], references: [id])
+  productOptions    ProductOption[]
+  votes             Vote[]
+  productUsers      ProductUser[]
+  productCategories ProductCategory[]
+}
+
+model Variant {
+  id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  name          String
+  variantValues VariantValue[]
+}
+
+model VariantValue {
+  id                  Int                  @id @default(autoincrement())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  name                String
+  variantId           Int
+  variant             Variant              @relation(fields: [variantId], references: [id])
+  productOptionValues ProductOptionValue[]
+}
+
+model ProductOption {
+  id                  Int                  @id @default(autoincrement())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  title               String
+  sku                 String               @default("")
+  amount              Int
+  productId           Int
+  product             Product              @relation(fields: [productId], references: [id])
+  productOptionValues ProductOptionValue[]
+  // orderItems         OrderItem[]
+}
+
+model ProductOptionValue {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  productOptionId Int
+  variantValueId  Int
+  productOption   ProductOption @relation(fields: [productOptionId], references: [id])
+  variantValue    VariantValue  @relation(fields: [variantValueId], references: [id])
+}
+
+// model OrderStatus {
+//   id          Int      @id @default(autoincrement())
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   name        String
+//   isPending   Boolean
+//   isCompleted Boolean
+//   orders      Order[]
+// }
+
+// model Coupon {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   start     DateTime
+//   end       DateTime
+//   percent   Int
+//   code      String
+//   orders    Order[]
+// }
+
+// model Order {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   userId        Int
+//   city          String
+//   district      String
+//   ward          String
+//   street        String
+//   totalPrice    String
+//   orderStatusId Int
+//   couponId      Int
+//   orderStatus   OrderStatus @relation(fields: [orderStatusId], references: [id])
+//   coupon        Coupon?     @relation(fields: [couponId], references: [id])
+//   user          User        @relation(fields: [userId], references: [id])
+//   orderItems    OrderItem[]
+
+// }
+
+// model OrderItem {
+//   id              Int           @id @default(autoincrement())
+//   createdAt       DateTime      @default(now())
+//   updatedAt       DateTime      @updatedAt
+//   productOptionId Int
+//   orderId         Int
+//   price           Int
+//   quantity        Int
+//   productOption   ProductOption @relation(fields: [productOptionId], references: [id])
+//   order           Order         @relation(fields: [orderId], references: [id])
+// }
+
+// model PaymentMethod {
+//   id              Int      @id @default(autoincrement())
+//   createdAt       DateTime @default(now())
+//   updatedAt       DateTime @updatedAt
+//   name            String
+//   requireShipping Boolean
+// }
+
+model Media {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String
+  banners     Banner[]
+}
+
+model Banner {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  slug        String   @unique
+  description String
+  thumbnail   String
+  isShow      Boolean  @default(true)
+  mediaId     Int
+  media       Media    @relation(fields: [mediaId], references: [id])
+}
+
+model Vote {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    Int
+  productId Int
+  content   String
+  rate      Int
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+  repVotes  RepVote[]
+}
+
+model RepVote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  voteId    Int
+  userId    Int?
+  content   String
+  user      User?    @relation(fields: [userId], references: [id])
+  vote      Vote     @relation(fields: [voteId], references: [id])
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String
+  content     String
+  thumbnail   String
+  description String
+  adminId     Int
+  comments    Comment[]
+}
+
+model Comment {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  content     String
+  postId      Int
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  post        Post         @relation(fields: [postId], references: [id])
+  repComments RepComment[]
+}
+
+model RepComment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String
+  userId    Int
+  commentId Int
+  user      User     @relation(fields: [userId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id])
+}
+
+model ProductUser {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
