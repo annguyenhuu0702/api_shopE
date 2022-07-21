@@ -73,7 +73,6 @@ model Category {
   parentId            Int?              @map("categoryId")
   parent              Category?         @relation("CategoryToCategory", fields: [parentId], references: [id])
   children            Category[]        @relation("CategoryToCategory")
-  products            Product[]
   productCategories   ProductCategory[]
 }
 
@@ -97,7 +96,6 @@ model Product {
   thumbnail         String
   slug              String            @unique
   categoryId        Int
-  category          Category          @relation(fields: [categoryId], references: [id])
   productOptions    ProductOption[]
   votes             Vote[]
   productUsers      ProductUser[]

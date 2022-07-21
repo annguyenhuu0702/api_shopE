@@ -1,22 +1,25 @@
 import jwt from "jsonwebtoken";
 import * as dotenv from "dotenv";
-import { RegisterDto, typeAuth,  } from "../types/auth";
+import { loginDto, registerDto, typeAuth } from "../types/auth";
 import { db } from "../utils/db.server";
 import * as argon from "argon2";
 import { ResponseErrorType, ResponseType } from "../types/common";
-import {Response} from 'express'
+import { Response } from "express";
 
 dotenv.config();
 
-export const register = async (body: RegisterDto, res: Response) : Promise<ResponseType<typeAuth> | ResponseErrorType> => {
+export const register = async (
+  body: registerDto,
+  res: Response
+): Promise<ResponseType<typeAuth> | ResponseErrorType> => {
   try {
     const { email, password, fullname } = body;
-    const checkUser = await db.user.findUnique({
+    const isEmail = await db.user.findUnique({
       where: {
         email,
       },
     });
-    if (checkUser) {
+    if (isEmail) {
       return {
         status: 403,
         data: { message: "Email already is exists" },
@@ -32,40 +35,95 @@ export const register = async (body: RegisterDto, res: Response) : Promise<Respo
     });
     const { hash: _hash, ...other } = user;
     const access_token = createAccessToken({
-      id: user.id
-    })
+      id: user.id,
+    });
 
     const refresh_token = createRefreshToken({
-      id: user.id
-    })
+      id: user.id,
+    });
 
-    res.cookie("AT", refresh_token,{
+    res.cookie("REFRESH_TOKEN", refresh_token, {
       sameSite: "strict",
       httpOnly: true,
-      secure: false
-    })
+      secure: false,
+    });
 
     return {
-      status: 200,
-      data: { user: other, access_token: access_token },
+      status: 201,
+      data: {
+        data: { user: other, access_token: access_token },
+        message: "ok",
+      },
     };
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return {
-      status : 500,
-      data: {message : "Lỗi rồi"}
-    }
+      status: 500,
+      data: { message: "Lỗi rồi" },
+    };
   }
 };
 
-const createAccessToken = (obj : any) => {
+export const login = async (
+  body: loginDto,
+  res: Response
+): Promise<ResponseType<typeAuth> | ResponseErrorType> => {
+  try {
+    const { email, password } = body;
+    const checkUser = await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!checkUser) {
+      return {
+        status: 403,
+        data: { message: "Email or password wrong!" },
+      };
+    }
+    const isPassword = await argon.verify(checkUser.hash, password);
+    if (!isPassword) {
+      return {
+        status: 403,
+        data: { message: "Email or password wrong!" },
+      };
+    }
+    const { hash: _hash, ...other } = checkUser;
+    const access_token = createAccessToken({
+      id: checkUser.id,
+    });
+    const refresh_token = createRefreshToken({
+      id: checkUser.id,
+    });
+    res.cookie("REFRESH_TOKEN", refresh_token, {
+      sameSite: "strict",
+      httpOnly: true,
+      secure: false,
+    });
+    return {
+      status: 201,
+      data: {
+        data: { user: other, access_token: access_token },
+        message: "ok",
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: { message: "lỗi rồi" },
+    };
+  }
+};
+
+const createAccessToken = (obj: any) => {
   const access_token = jwt.sign(obj, process.env.AT || "super-serect", {
-    expiresIn: "1h",
+    expiresIn: "3h",
   });
   return access_token;
 };
 
-const createRefreshToken = (obj : any) => {
+const createRefreshToken = (obj: any) => {
   const refresh_token = jwt.sign(obj, process.env.RF || "super-serect", {
     expiresIn: "360h",
   });

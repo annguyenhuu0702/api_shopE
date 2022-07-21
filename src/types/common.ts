@@ -14,7 +14,7 @@ export interface ResponseErrorType {
 
 export interface ResponseType<T> {
   status: number;
-  data: T | null;
+  data: { data: T | null; message?: string };
 }
 
 export interface ResponseItemsType<T> {
