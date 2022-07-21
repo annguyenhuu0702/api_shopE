@@ -10,7 +10,8 @@ export const auth_controller = {
     const { data, status } = await login(req.body, res);
     return res.status(status).json(data);
   },
-  logOut: async (req: Request, res: Response) => {
-    res.clearCookie("REFRESH_TOKEN")
+  logout: async (req: Request, res: Response) => {
+    res.clearCookie("REFRESH_TOKEN");
+    res.status(201).json({ message: "ok" });
   },
 };

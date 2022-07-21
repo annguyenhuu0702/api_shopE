@@ -46,6 +46,7 @@ export const register = async (
       sameSite: "strict",
       httpOnly: true,
       secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return {
@@ -99,6 +100,7 @@ export const login = async (
       sameSite: "strict",
       httpOnly: true,
       secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
     });
     return {
       status: 201,
@@ -125,7 +127,7 @@ const createAccessToken = (obj: any) => {
 
 const createRefreshToken = (obj: any) => {
   const refresh_token = jwt.sign(obj, process.env.RF || "super-serect", {
-    expiresIn: "360h",
+    expiresIn: "24h",
   });
   return refresh_token;
 };
