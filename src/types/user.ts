@@ -4,6 +4,7 @@ export interface User {
   updatedAt: Date;
   fullname: string;
   email: string;
+  hash?: string;
   city: string;
   ward: string;
   district: string;
@@ -16,4 +17,17 @@ export interface User {
   // comments
   // repComments
   // userRoles
+}
+
+export interface UserDto {
+  fullname: string;
+  email: string;
+  password: string;
+  city: string;
+  ward: string;
+  district: string;
+  street: string;
+  avatar: string;
+  phone: string;
+  gender: boolean;
 }

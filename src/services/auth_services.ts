@@ -33,13 +33,24 @@ export const register = async (
         fullname,
       },
     });
+    const userRole = await db.userRole.create({
+      data: {
+        userId: user.id,
+        roleId: 3,
+      },
+      include: {
+        role: true,
+      },
+    });
     const { hash: _hash, ...other } = user;
     const access_token = createAccessToken({
       id: user.id,
+      role: userRole.role.name,
     });
 
     const refresh_token = createRefreshToken({
       id: user.id,
+      role: userRole.role.name,
     });
 
     res.cookie("REFRESH_TOKEN", refresh_token, {
@@ -75,7 +86,15 @@ export const login = async (
       where: {
         email,
       },
+      include: {
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
+
     if (!checkUser) {
       return {
         status: 403,
@@ -92,9 +111,11 @@ export const login = async (
     const { hash: _hash, ...other } = checkUser;
     const access_token = createAccessToken({
       id: checkUser.id,
+      role: checkUser.userRoles[0].role.name,
     });
     const refresh_token = createRefreshToken({
       id: checkUser.id,
+      role: checkUser.userRoles[0].role.name,
     });
     res.cookie("REFRESH_TOKEN", refresh_token, {
       sameSite: "strict",

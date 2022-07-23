@@ -16,6 +16,7 @@ model Role {
   updatedAt DateTime   @updatedAt
   name      String
   userRoles UserRole[]
+  isDeleted Boolean    @default(false)
 }
 
 model User {
@@ -31,6 +32,8 @@ model User {
   street       String        @default("")
   avatar       String        @default("")
   phone        String        @default("")
+  gender       Boolean       @default(true)
+  isDeleted    Boolean       @default(false)
   // orders       Order[]
   votes        Vote[]
   repVotes     RepVote[]
@@ -48,6 +51,7 @@ model UserRole {
   roleId    Int
   user      User     @relation(fields: [userId], references: [id])
   role      Role     @relation(fields: [roleId], references: [id])
+  isDeleted Boolean  @default(false)
 }
 
 model CategoryType {
