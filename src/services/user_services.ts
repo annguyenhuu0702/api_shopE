@@ -1,5 +1,5 @@
 import * as argon from "argon2";
-import { ResponseErrorType, ResponseType } from "../types/common";
+import { QueryItems, ResponseErrorType, ResponseType } from "../types/common";
 import { User, UserDto } from "../types/user";
 import { db } from "../utils/db.server";
 
@@ -47,7 +47,47 @@ export const user_services = {
       console.log(error);
       return {
         status: 500,
-        data: { message: "lỗi" },
+        data: { message: "Error" },
+      };
+    }
+  },
+  getAll: async (
+    query: QueryItems
+  ): Promise<ResponseType<User[]> | ResponseErrorType> => {
+    const { p, limit } = query;
+    try {
+      const users: User[] = await db.user.findMany({
+        // skip: parseInt(limit) * parseInt(p - 1),
+        // take: parseInt(limit),
+        where: {
+          userRoles: {
+            every: {
+              role: {
+                name: "user",
+              },
+            },
+          },
+        },
+      });
+      const newData = users.map((item) => {
+        const { hash, ...others } = item;
+        return others;
+      });
+
+      return {
+        status: 200,
+        data: {
+          data: newData,
+          message: "ok",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
       };
     }
   },

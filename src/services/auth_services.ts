@@ -1,10 +1,10 @@
-import jwt from "jsonwebtoken";
-import * as dotenv from "dotenv";
-import { loginDto, registerDto, typeAuth } from "../types/auth";
-import { db } from "../utils/db.server";
 import * as argon from "argon2";
-import { ResponseErrorType, ResponseType } from "../types/common";
+import * as dotenv from "dotenv";
 import { Response } from "express";
+import jwt from "jsonwebtoken";
+import { loginDto, registerDto, typeAuth } from "../types/auth";
+import { ResponseErrorType, ResponseType } from "../types/common";
+import { db } from "../utils/db.server";
 
 dotenv.config();
 
