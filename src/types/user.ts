@@ -22,9 +22,11 @@ export interface User {
 }
 
 export interface UserDto {
-  fullname: string;
   email: string;
   password: string;
+  avatar: string;
+  fullname: string;
   phone: string;
-  avatar?: string;
+  ward: string;
+  gender: boolean;
 }

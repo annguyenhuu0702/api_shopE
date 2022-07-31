@@ -1,5 +1,10 @@
 import * as argon from "argon2";
-import { QueryItems, ResponseErrorType, ResponseType } from "../types/common";
+import {
+  QueryItems,
+  ResponseErrorType,
+  ResponseType,
+  ResponseTypePagination,
+} from "../types/common";
 import { User, UserDto } from "../types/user";
 import { db } from "../utils/db.server";
 
@@ -40,7 +45,7 @@ export const user_services = {
       });
       const { hash: _hash, ...other } = user;
       return {
-        status: 500,
+        status: 200,
         data: { data: other, message: "Ok" },
       };
     } catch (error) {
@@ -53,12 +58,31 @@ export const user_services = {
   },
   getAll: async (
     query: QueryItems
-  ): Promise<ResponseType<User[]> | ResponseErrorType> => {
+  ): Promise<ResponseTypePagination<User> | ResponseErrorType> => {
     const { p, limit } = query;
     try {
       const users: User[] = await db.user.findMany({
-        // skip: parseInt(limit) * parseInt(p - 1),
-        // take: parseInt(limit),
+        where: {
+          userRoles: {
+            every: {
+              role: {
+                name: "user",
+              },
+            },
+          },
+        },
+        take: limit ? parseInt(limit) : 7,
+        skip: limit && p ? (parseInt(p) - 1) * parseInt(limit) : 0,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      const newData = users.map((item) => {
+        const { hash, ...others } = item;
+        return others;
+      });
+
+      const count = await db.user.count({
         where: {
           userRoles: {
             every: {
@@ -69,15 +93,14 @@ export const user_services = {
           },
         },
       });
-      const newData = users.map((item) => {
-        const { hash, ...others } = item;
-        return others;
-      });
 
       return {
         status: 200,
         data: {
-          data: newData,
+          data: {
+            rows: newData,
+            count,
+          },
           message: "ok",
         },
       };

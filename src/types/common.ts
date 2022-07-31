@@ -17,6 +17,17 @@ export interface ResponseType<T> {
   data: { data: T | null; message?: string };
 }
 
+export interface ResponseTypePagination<T> {
+  status: number;
+  data: {
+    data: {
+      rows: T[];
+      count: number;
+    };
+    message?: string;
+  };
+}
+
 export interface ResponseItemsType<T> {
   items: T[];
   totalResult?: number;

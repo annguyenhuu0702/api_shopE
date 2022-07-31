@@ -1,11 +1,10 @@
-import express from 'express';
+import express from "express";
 import * as dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import routes from './routes'
-
+import routes from "./routes";
 
 const app = express();
 
@@ -23,9 +22,8 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(routes)
+app.use(routes);
 
 app.listen(port, () => {
   console.log("trying ever day", port);
 });
-
