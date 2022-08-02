@@ -42,7 +42,7 @@ export const register = async (
         role: true,
       },
     });
-    const { hash: _hash, ...other } = user;
+    const { hash: _hash, ...others } = user;
     const access_token = createAccessToken({
       id: user.id,
       role: userRole.role.name,
@@ -63,7 +63,7 @@ export const register = async (
     return {
       status: 201,
       data: {
-        data: { user: other, access_token: access_token },
+        data: { user: others, access_token: access_token },
         message: "ok",
       },
     };
@@ -108,7 +108,7 @@ export const login = async (
         data: { message: "Email or password wrong!" },
       };
     }
-    const { hash: _hash, ...other } = checkUser;
+    const { hash: _hash, ...others } = checkUser;
     const access_token = createAccessToken({
       id: checkUser.id,
       role: checkUser.userRoles[0].role.name,
@@ -126,7 +126,7 @@ export const login = async (
     return {
       status: 201,
       data: {
-        data: { user: other, access_token: access_token },
+        data: { user: others, access_token: access_token },
         message: "ok",
       },
     };

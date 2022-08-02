@@ -21,7 +21,7 @@ export interface ResponseTypePagination<T> {
   status: number;
   data: {
     data: {
-      rows: T[];
+      rows: T;
       count: number;
     };
     message?: string;

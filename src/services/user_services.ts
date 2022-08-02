@@ -1,3 +1,4 @@
+import { prisma } from "@prisma/client";
 import * as argon from "argon2";
 import {
   QueryItems,
@@ -13,7 +14,7 @@ export const user_services = {
     body: UserDto
   ): Promise<ResponseType<User> | ResponseErrorType> => {
     try {
-      const { email, password, ...others } = body;
+      const { email, password, ...other } = body;
       const isEmail = await db.user.findUnique({
         where: {
           email,
@@ -29,7 +30,7 @@ export const user_services = {
       const hash = await argon.hash(password);
       const user = await db.user.create({
         data: {
-          ...others,
+          ...other,
           hash,
           email,
         },
@@ -43,10 +44,10 @@ export const user_services = {
           role: true,
         },
       });
-      const { hash: _hash, ...other } = user;
+      const { hash: _hash, ...others } = user;
       return {
         status: 200,
-        data: { data: other, message: "Ok" },
+        data: { data: others, message: "Ok" },
       };
     } catch (error) {
       console.log(error);
@@ -58,7 +59,7 @@ export const user_services = {
   },
   getAll: async (
     query: QueryItems
-  ): Promise<ResponseTypePagination<User> | ResponseErrorType> => {
+  ): Promise<ResponseTypePagination<User[]> | ResponseErrorType> => {
     const { p, limit } = query;
     try {
       const users: User[] = await db.user.findMany({
@@ -104,6 +105,71 @@ export const user_services = {
           message: "ok",
         },
       };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  update: async (
+    body: UserDto,
+    id: string
+  ): Promise<ResponseType<User> | ResponseErrorType> => {
+    try {
+      const updateUser = await db.user.update({
+        where: {
+          id: parseInt(id),
+        },
+        data: {
+          ...body,
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: updateUser,
+          message: "Update successfully!",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  getById: async (id: string) => {
+    try {
+      const user = await db.user.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (user !== null) {
+        const { hash, ...others } = user;
+        return {
+          status: 200,
+          data: {
+            data: others,
+            message: "Ok",
+          },
+        };
+      } else {
+        return {
+          status: 200,
+          data: {
+            data: user,
+            message: "Ok",
+          },
+        };
+      }
     } catch (error) {
       console.log(error);
       return {
