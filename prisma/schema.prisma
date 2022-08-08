@@ -31,6 +31,7 @@ model User {
   district     String        @default("")
   street       String        @default("")
   avatar       String        @default("")
+  birthday     DateTime      @default(now())
   phone        String        @default("")
   gender       Boolean       @default(true)
   isDeleted    Boolean       @default(false)

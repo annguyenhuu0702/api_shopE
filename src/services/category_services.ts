@@ -1,11 +1,11 @@
 import { categoryDto, typeCategory } from "../types/category";
-import { ResponseErrorType, ResponseType } from "../types/common";
+import { ResponseMessage, ResponseType } from "../types/common";
 import { db } from "../utils/db.server";
 
 export const category_service = {
   create: async (
     body: categoryDto
-  ): Promise<ResponseType<typeCategory> | ResponseErrorType> => {
+  ): Promise<ResponseType<typeCategory> | ResponseMessage> => {
     try {
       const data: typeCategory & {
         parent: typeCategory | null;
@@ -17,7 +17,7 @@ export const category_service = {
       });
       return {
         status: 201,
-        data: { data: data, message: "ok" },
+        data: { data: data, message: "Success" },
       };
     } catch (error) {
       return {

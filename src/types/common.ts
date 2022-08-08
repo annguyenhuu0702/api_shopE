@@ -7,7 +7,7 @@ export interface ResponseBatchPayload {
   data: BatchPayload;
 }
 
-export interface ResponseErrorType {
+export interface ResponseMessage {
   status: number;
   data: { message: string };
 }

@@ -9,6 +9,7 @@ export interface User {
   ward: string;
   district: string;
   street: string;
+  birthday: Date;
   avatar: string;
   phone: string;
   isDeleted: boolean;

@@ -1,8 +1,7 @@
-import { prisma } from "@prisma/client";
 import * as argon from "argon2";
 import {
   QueryItems,
-  ResponseErrorType,
+  ResponseMessage,
   ResponseType,
   ResponseTypePagination,
 } from "../types/common";
@@ -12,7 +11,7 @@ import { db } from "../utils/db.server";
 export const user_services = {
   create: async (
     body: UserDto
-  ): Promise<ResponseType<User> | ResponseErrorType> => {
+  ): Promise<ResponseType<User> | ResponseMessage> => {
     try {
       const { email, password, ...other } = body;
       const isEmail = await db.user.findUnique({
@@ -47,7 +46,7 @@ export const user_services = {
       const { hash: _hash, ...others } = user;
       return {
         status: 200,
-        data: { data: others, message: "Ok" },
+        data: { data: others, message: "Success" },
       };
     } catch (error) {
       console.log(error);
@@ -57,9 +56,44 @@ export const user_services = {
       };
     }
   },
+  getById: async (id: string) => {
+    try {
+      const user = await db.user.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (user !== null) {
+        const { hash, ...others } = user;
+        return {
+          status: 200,
+          data: {
+            data: others,
+            message: "Success",
+          },
+        };
+      } else {
+        return {
+          status: 200,
+          data: {
+            data: user,
+            message: "Success",
+          },
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
   getAll: async (
     query: QueryItems
-  ): Promise<ResponseTypePagination<User[]> | ResponseErrorType> => {
+  ): Promise<ResponseTypePagination<User[]> | ResponseMessage> => {
     const { p, limit } = query;
     try {
       const users: User[] = await db.user.findMany({
@@ -94,7 +128,7 @@ export const user_services = {
           },
         },
       });
-
+      console.log(count);
       return {
         status: 200,
         data: {
@@ -102,7 +136,7 @@ export const user_services = {
             rows: newData,
             count,
           },
-          message: "ok",
+          message: "Success",
         },
       };
     } catch (error) {
@@ -118,7 +152,7 @@ export const user_services = {
   update: async (
     body: UserDto,
     id: string
-  ): Promise<ResponseType<User> | ResponseErrorType> => {
+  ): Promise<ResponseType<User> | ResponseMessage> => {
     try {
       const updateUser = await db.user.update({
         where: {
@@ -128,48 +162,14 @@ export const user_services = {
           ...body,
         },
       });
+      const { hash, ...others } = updateUser;
       return {
         status: 200,
         data: {
-          data: updateUser,
+          data: others,
           message: "Update successfully!",
         },
       };
-    } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        data: {
-          message: "Error",
-        },
-      };
-    }
-  },
-  getById: async (id: string) => {
-    try {
-      const user = await db.user.findUnique({
-        where: {
-          id: parseInt(id),
-        },
-      });
-      if (user !== null) {
-        const { hash, ...others } = user;
-        return {
-          status: 200,
-          data: {
-            data: others,
-            message: "Ok",
-          },
-        };
-      } else {
-        return {
-          status: 200,
-          data: {
-            data: user,
-            message: "Ok",
-          },
-        };
-      }
     } catch (error) {
       console.log(error);
       return {

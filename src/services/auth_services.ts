@@ -1,17 +1,37 @@
 import * as argon from "argon2";
 import * as dotenv from "dotenv";
-import { Response } from "express";
+import { Response, Request } from "express";
 import jwt from "jsonwebtoken";
-import { loginDto, registerDto, typeAuth } from "../types/auth";
-import { ResponseErrorType, ResponseType } from "../types/common";
+import {
+  changeProfileDto,
+  loginDto,
+  registerDto,
+  typeAuth,
+} from "../types/auth";
+import { ResponseMessage, ResponseType } from "../types/common";
+import { User } from "../types/user";
 import { db } from "../utils/db.server";
 
 dotenv.config();
 
+const createAccessToken = (obj: any) => {
+  const accessToken = jwt.sign(obj, process.env.AT || "super-serect", {
+    expiresIn: "3h",
+  });
+  return accessToken;
+};
+
+const createRefreshToken = (obj: any) => {
+  const refresh_token = jwt.sign(obj, process.env.RF || "super-serect", {
+    expiresIn: "24h",
+  });
+  return refresh_token;
+};
+
 export const register = async (
   body: registerDto,
   res: Response
-): Promise<ResponseType<typeAuth> | ResponseErrorType> => {
+): Promise<ResponseType<typeAuth> | ResponseMessage> => {
   try {
     const { email, password, fullname } = body;
     const isEmail = await db.user.findUnique({
@@ -43,7 +63,7 @@ export const register = async (
       },
     });
     const { hash: _hash, ...others } = user;
-    const access_token = createAccessToken({
+    const accessToken = createAccessToken({
       id: user.id,
       role: userRole.role.name,
     });
@@ -63,8 +83,8 @@ export const register = async (
     return {
       status: 201,
       data: {
-        data: { user: others, access_token: access_token },
-        message: "ok",
+        data: { user: others, accessToken: accessToken },
+        message: "Success",
       },
     };
   } catch (error) {
@@ -79,7 +99,7 @@ export const register = async (
 export const login = async (
   body: loginDto,
   res: Response
-): Promise<ResponseType<typeAuth> | ResponseErrorType> => {
+): Promise<ResponseType<typeAuth> | ResponseMessage> => {
   try {
     const { email, password } = body;
     const checkUser = await db.user.findUnique({
@@ -109,7 +129,7 @@ export const login = async (
       };
     }
     const { hash: _hash, ...others } = checkUser;
-    const access_token = createAccessToken({
+    const accessToken = createAccessToken({
       id: checkUser.id,
       role: checkUser.userRoles[0].role.name,
     });
@@ -126,8 +146,8 @@ export const login = async (
     return {
       status: 201,
       data: {
-        data: { user: others, access_token: access_token },
-        message: "ok",
+        data: { user: others, accessToken: accessToken },
+        message: "Success",
       },
     };
   } catch (error) {
@@ -139,16 +159,126 @@ export const login = async (
   }
 };
 
-const createAccessToken = (obj: any) => {
-  const access_token = jwt.sign(obj, process.env.AT || "super-serect", {
-    expiresIn: "3h",
-  });
-  return access_token;
+export const refreshToken = async (
+  req: Request
+): Promise<ResponseType<{ accessToken: string }> | ResponseMessage> => {
+  try {
+    if (!req.cookies) {
+      return {
+        status: 401,
+        data: {
+          message: "Login now",
+        },
+      };
+    }
+    const refreshToken = req.cookies["RT"];
+    if (!refreshToken) {
+      return {
+        status: 401,
+        data: {
+          message: "Login now",
+        },
+      };
+    }
+
+    const decoded: any = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET || "super-secret-1",
+      {
+        ignoreExpiration: true,
+      }
+    );
+
+    const accessToken = jwt.sign(
+      { id: decoded.id, userRoles: decoded.userRoles },
+      process.env.accessToken_SECRET || "super-secret",
+      {
+        expiresIn: 30 * 1000,
+      }
+    );
+
+    return {
+      status: 201,
+      data: {
+        data: {
+          accessToken,
+        },
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: { message: "Something is wrong" },
+    };
+  }
 };
 
-const createRefreshToken = (obj: any) => {
-  const refresh_token = jwt.sign(obj, process.env.RF || "super-serect", {
-    expiresIn: "24h",
-  });
-  return refresh_token;
+export const getProfile = async (
+  user: any
+): Promise<ResponseType<User> | ResponseMessage> => {
+  try {
+    const data = await db.user.findUnique({
+      where: {
+        id: user.id,
+      },
+    });
+    if (data) {
+      const { hash, ...others } = data;
+      return {
+        status: 200,
+        data: {
+          data: others,
+          message: "Success",
+        },
+      };
+    } else {
+      return {
+        status: 200,
+        data: {
+          data: null,
+          message: "Success",
+        },
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: {
+        message: "Error!",
+      },
+    };
+  }
+};
+
+export const changeProfile = async (
+  body: changeProfileDto,
+  user: any
+): Promise<ResponseMessage> => {
+  try {
+    const data = await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        ...body,
+      },
+    });
+    const { hash, ...others } = data;
+    return {
+      status: 200,
+      data: {
+        message: "Change profile successfully!",
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: {
+        message: "Error",
+      },
+    };
+  }
 };
