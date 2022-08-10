@@ -19,4 +19,23 @@ export const authMiddlewares = {
     }
     return res.status(401).json({ message: "Unauthorized" });
   },
+
+  verifyAdmin: (req: Request, res: Response, next: NextFunction): any => {
+    const reqHeader = req.headers["authorization"];
+    if (reqHeader) {
+      const accessToken = reqHeader.split(" ")[1];
+      if (accessToken) {
+        try {
+          const user: any = jwt.verify(accessToken, process.env.AT || "mickey");
+          res.locals.user = user;
+          if (user.role === "admin") {
+            return next();
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+    return res.status(401).json({ message: "Unauthorized" });
+  },
 };

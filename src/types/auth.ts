@@ -21,3 +21,12 @@ export interface changeProfileDto {
   birthday: Date;
   gender: boolean;
 }
+
+export interface changePasswordDto {
+  currentpassword: string;
+  newpassword: string;
+}
+
+export interface changeEmailDto {
+  email: string;
+}

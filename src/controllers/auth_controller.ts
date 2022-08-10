@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import {
+  changeEmail,
+  changePassword,
   changeProfile,
   getProfile,
   login,
@@ -30,6 +32,14 @@ export const auth_controller = {
   },
   changeProfile: async (req: Request, res: Response) => {
     const { data, status } = await changeProfile(req.body, res.locals.user);
+    return res.status(status).json(data);
+  },
+  changePassword: async (req: Request, res: Response) => {
+    const { data, status } = await changePassword(req.body, res.locals.user);
+    return res.status(status).json(data);
+  },
+  changeEmail: async (req: Request, res: Response) => {
+    const { data, status } = await changeEmail(req.body, res.locals.user);
     return res.status(status).json(data);
   },
 };

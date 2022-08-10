@@ -19,7 +19,6 @@ export const user_services = {
           email,
         },
       });
-
       if (isEmail) {
         return {
           status: 403,
@@ -34,7 +33,7 @@ export const user_services = {
           email,
         },
       });
-      const userRole = await db.userRole.create({
+      await db.userRole.create({
         data: {
           userId: user.id,
           roleId: 3,
@@ -128,7 +127,6 @@ export const user_services = {
           },
         },
       });
-      console.log(count);
       return {
         status: 200,
         data: {

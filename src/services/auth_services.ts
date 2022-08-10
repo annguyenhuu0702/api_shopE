@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import { Response, Request } from "express";
 import jwt from "jsonwebtoken";
 import {
+  changeEmailDto,
+  changePasswordDto,
   changeProfileDto,
   loginDto,
   registerDto,
@@ -171,7 +173,7 @@ export const refreshToken = async (
         },
       };
     }
-    const refreshToken = req.cookies["RT"];
+    const refreshToken = req.cookies["REFRESH_TOKEN"];
     if (!refreshToken) {
       return {
         status: 401,
@@ -191,9 +193,9 @@ export const refreshToken = async (
 
     const accessToken = jwt.sign(
       { id: decoded.id, userRoles: decoded.userRoles },
-      process.env.accessToken_SECRET || "super-secret",
+      process.env.ACCESS_TOKEN_SECRET || "super-secret",
       {
-        expiresIn: 30 * 1000,
+        expiresIn: 3 * 60 * 60 * 1000,
       }
     );
 
@@ -257,7 +259,7 @@ export const changeProfile = async (
   user: any
 ): Promise<ResponseMessage> => {
   try {
-    const data = await db.user.update({
+    await db.user.update({
       where: {
         id: user.id,
       },
@@ -265,11 +267,87 @@ export const changeProfile = async (
         ...body,
       },
     });
-    const { hash, ...others } = data;
     return {
       status: 200,
       data: {
         message: "Change profile successfully!",
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: {
+        message: "Error",
+      },
+    };
+  }
+};
+
+export const changePassword = async (
+  body: changePasswordDto,
+  user: any
+): Promise<ResponseMessage> => {
+  try {
+    const data = await db.user.findFirst({
+      where: {
+        id: user.id,
+      },
+    });
+    if (data) {
+      const checkPassword = await argon.verify(data.hash, body.currentpassword);
+      if (checkPassword) {
+        const hash = await argon.hash(body.newpassword);
+        await db.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            hash: hash,
+          },
+        });
+        return {
+          status: 200,
+          data: {
+            message: "Change password successfully!",
+          },
+        };
+      }
+    }
+    return {
+      status: 400,
+      data: {
+        message: "Error!",
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+      data: {
+        message: "Error",
+      },
+    };
+  }
+};
+
+export const changeEmail = async (
+  body: changeEmailDto,
+  user: any
+): Promise<ResponseMessage> => {
+  try {
+    await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        ...body,
+      },
+    });
+    return {
+      status: 200,
+      data: {
+        message: "Change email successfully!",
       },
     };
   } catch (error) {

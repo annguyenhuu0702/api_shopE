@@ -17,6 +17,17 @@ router.put(
   authMiddlewares.loginRequire,
   auth_controller.changeProfile
 );
+router.put(
+  "/changePassword",
+  authMiddlewares.loginRequire,
+  auth_controller.changePassword
+);
+router.put(
+  "/changeEmail",
+  authMiddlewares.loginRequire,
+  auth_controller.changeEmail
+);
+
 router.post("/refreshToken", auth_controller.refreshToken);
 
 export default router;
