@@ -13,6 +13,10 @@ export const user_controller = {
     );
     return res.status(status).json(data);
   },
+  delete: async (req: Request, res: Response) => {
+    const { data, status } = await user_services.delete(req.params.id);
+    return res.status(status).json(data);
+  },
   getAll: async (req: Request, res: Response) => {
     const { data, status } = await user_services.getAll(req.query);
     return res.status(status).json(data);

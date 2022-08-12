@@ -97,6 +97,7 @@ export const user_services = {
     try {
       const users: User[] = await db.user.findMany({
         where: {
+          isDeleted: false,
           userRoles: {
             every: {
               role: {
@@ -118,6 +119,7 @@ export const user_services = {
 
       const count = await db.user.count({
         where: {
+          isDeleted: false,
           userRoles: {
             every: {
               role: {
@@ -152,7 +154,7 @@ export const user_services = {
     id: string
   ): Promise<ResponseType<User> | ResponseMessage> => {
     try {
-      const updateUser = await db.user.update({
+      const data = await db.user.update({
         where: {
           id: parseInt(id),
         },
@@ -160,12 +162,35 @@ export const user_services = {
           ...body,
         },
       });
-      const { hash, ...others } = updateUser;
+      const { hash, ...others } = data;
       return {
         status: 200,
         data: {
           data: others,
           message: "Update successfully!",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
+  delete: async (id: string): Promise<ResponseMessage> => {
+    try {
+      await db.user.delete({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          message: "Delete successfully!",
         },
       };
     } catch (error) {

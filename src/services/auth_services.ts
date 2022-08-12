@@ -18,7 +18,7 @@ dotenv.config();
 
 const createAccessToken = (obj: any) => {
   const accessToken = jwt.sign(obj, process.env.AT || "super-serect", {
-    expiresIn: "3h",
+    expiresIn: "1h",
   });
   return accessToken;
 };
@@ -195,7 +195,7 @@ export const refreshToken = async (
       { id: decoded.id, userRoles: decoded.userRoles },
       process.env.ACCESS_TOKEN_SECRET || "super-secret",
       {
-        expiresIn: 3 * 60 * 60 * 1000,
+        expiresIn: 1 * 60 * 60 * 1000,
       }
     );
 

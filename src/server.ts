@@ -1,10 +1,10 @@
-import express from "express";
-import * as dotenv from "dotenv";
-dotenv.config();
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import * as dotenv from "dotenv";
+import express from "express";
 import routes from "./routes";
+dotenv.config();
 
 const app = express();
 
@@ -17,7 +17,6 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

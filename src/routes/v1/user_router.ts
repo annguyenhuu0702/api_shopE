@@ -12,5 +12,10 @@ router.get(
 );
 router.post("/create", authMiddlewares.verifyAdmin, user_controller.create);
 router.put("/update/:id", authMiddlewares.verifyAdmin, user_controller.update);
+router.delete(
+  "/delete/:id",
+  authMiddlewares.verifyAdmin,
+  user_controller.delete
+);
 
 export default router;
