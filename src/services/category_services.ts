@@ -7,9 +7,7 @@ export const category_service = {
     body: categoryDto
   ): Promise<ResponseType<typeCategory> | ResponseMessage> => {
     try {
-      const data: typeCategory & {
-        parent: typeCategory | null;
-      } = await db.category.create({
+      const data = await db.category.create({
         data: body,
         include: {
           parent: true,

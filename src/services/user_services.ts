@@ -1,11 +1,10 @@
 import * as argon from "argon2";
 import {
-  QueryItems,
   ResponseMessage,
   ResponseType,
   ResponseTypePagination,
 } from "../types/common";
-import { User, UserDto } from "../types/user";
+import { GetAllUserDto, User, UserDto } from "../types/user";
 import { db } from "../utils/db.server";
 
 export const user_services = {
@@ -91,11 +90,11 @@ export const user_services = {
     }
   },
   getAll: async (
-    query: QueryItems
+    query: GetAllUserDto
   ): Promise<ResponseTypePagination<User[]> | ResponseMessage> => {
-    const { p, limit } = query;
+    const { p, limit, email, fullname, phone } = query;
     try {
-      const users: User[] = await db.user.findMany({
+      const users = await db.user.findMany({
         where: {
           isDeleted: false,
           userRoles: {
@@ -105,6 +104,30 @@ export const user_services = {
               },
             },
           },
+          ...(email
+            ? {
+                email: {
+                  contains: email,
+                  mode: "insensitive",
+                },
+              }
+            : {}),
+          ...(fullname
+            ? {
+                fullname: {
+                  contains: fullname,
+                  mode: "insensitive",
+                },
+              }
+            : {}),
+          ...(phone
+            ? {
+                phone: {
+                  contains: phone,
+                  mode: "insensitive",
+                },
+              }
+            : {}),
         },
         take: limit ? parseInt(limit) : 7,
         skip: limit && p ? (parseInt(p) - 1) * parseInt(limit) : 0,

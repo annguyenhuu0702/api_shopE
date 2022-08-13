@@ -1,3 +1,5 @@
+import { QueryItems } from "./common";
+
 export interface User {
   id?: number | string;
   createdAt: Date;
@@ -30,4 +32,10 @@ export interface UserDto {
   phone: string;
   ward: string;
   gender: boolean;
+}
+
+export interface GetAllUserDto extends QueryItems {
+  email?: string;
+  fullname?: string;
+  phone?: string;
 }
