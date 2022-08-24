@@ -17,6 +17,7 @@ export interface typeCategory {
 }
 
 export interface categoryDto {
+  thumbnail?: string;
   slug: string;
   title: string;
   name: string;

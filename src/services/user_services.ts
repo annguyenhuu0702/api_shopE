@@ -129,8 +129,8 @@ export const user_services = {
               }
             : {}),
         },
-        take: limit ? parseInt(limit) : 7,
-        skip: limit && p ? (parseInt(p) - 1) * parseInt(limit) : 0,
+        ...(limit ? { take: parseInt(limit) } : {}),
+        ...(p && limit ? { skip: parseInt(limit) * (parseInt(p) - 1) } : {}),
         orderBy: {
           createdAt: "desc",
         },

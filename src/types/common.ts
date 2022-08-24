@@ -49,7 +49,3 @@ export interface QueryItems {
   sortType?: string;
   q?: string;
 }
-
-export interface IGetUserAuthInfoRequest extends Request {
-  user: any;
-}
