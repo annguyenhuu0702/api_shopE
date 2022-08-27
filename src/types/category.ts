@@ -1,4 +1,4 @@
-export interface typeCategory {
+export interface category {
   id: number;
   createdAt: Date;
   updatedAt: Date;

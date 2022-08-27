@@ -88,7 +88,7 @@ export const categoryType_service = {
         data: { ...body },
       });
       return {
-        status: 201,
+        status: 200,
         data: { data: data, message: "Update success" },
       };
     } catch (error) {

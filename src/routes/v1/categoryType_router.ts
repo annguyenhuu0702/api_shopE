@@ -11,7 +11,7 @@ router.post(
   categoryType_controller.create
 );
 router.put(
-  "/update",
+  "/update/:id",
   authMiddlewares.verifyAdmin,
   categoryType_controller.update
 );
