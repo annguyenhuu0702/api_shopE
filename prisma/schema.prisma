@@ -20,39 +20,39 @@ model Role {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  fullname     String
-  email        String        @unique
-  hash         String
-  city         String        @default("")
-  ward         String        @default("")
-  district     String        @default("")
-  street       String        @default("")
-  avatar       String        @default("")
-  birthday     DateTime      @default(now())
-  phone        String        @default("")
-  gender       Boolean       @default(true)
-  isDeleted    Boolean       @default(false)
-  // orders       Order[]
-  votes        Vote[]
-  repVotes     RepVote[]
-  productUsers ProductUser[]
-  comments     Comment[]
-  repComments  RepComment[]
-  userRoles    UserRole[]
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  fullname    String
+  email       String        @unique
+  hash        String
+  city        String        @default("")
+  ward        String        @default("")
+  district    String        @default("")
+  street      String        @default("")
+  avatar      String        @default("")
+  birthday    DateTime      @default(now())
+  phone       String        @default("")
+  gender      Boolean       @default(true)
+  isDeleted   Boolean       @default(false)
+  orders      Order[]
+  votes       Vote[]
+  repVotes    RepVote[]
+  product     ProductUser[]
+  comments    Comment[]
+  repComments RepComment[]
+  userRoles   UserRole[]
+  Cart        Cart?
 }
 
 model UserRole {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    Int
-  roleId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  role      Role     @relation(fields: [roleId], references: [id])
-  isDeleted Boolean  @default(false)
+  userId     Int
+  roleId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  role       Role     @relation(fields: [roleId], references: [id])
+  assignedAt DateTime @default(now())
+
+  @@id([userId, roleId])
 }
 
 model CategoryType {
@@ -65,33 +65,31 @@ model CategoryType {
 }
 
 model Category {
-  id                  Int               @id @default(autoincrement())
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  title               String
-  name                String            @default("")
-  description         String            @default("")
-  isDisplayedOnHeader Boolean           @default(false)
-  slug                String            @unique
-  thumbnail           String            @default("")
-  categoryTypeId      Int?
-  categoryType        CategoryType?     @relation(fields: [categoryTypeId], references: [id])
-  parentId            Int?              @map("categoryId")
-  parent              Category?         @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children            Category[]        @relation("CategoryToCategory")
-  productCategories   ProductCategory[]
-  isDeleted           Boolean           @default(false)
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  title             String
+  name              String            @default("")
+  description       String            @default("")
+  slug              String            @unique
+  thumbnail         String            @default("")
+  categoryTypeId    Int?
+  categoryType      CategoryType?     @relation(fields: [categoryTypeId], references: [id])
+  parentId          Int?              @map("categoryId")
+  parent            Category?         @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children          Category[]        @relation("CategoryToCategory")
+  productCategories ProductCategory[]
+  isDeleted         Boolean           @default(false)
 }
 
 model ProductCategory {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
   categoryId Int
   productId  Int
   product    Product  @relation(fields: [productId], references: [id])
   category   Category @relation(fields: [categoryId], references: [id])
-  isDeleted  Boolean  @default(false)
+  assignedAt DateTime @default(now())
+
+  @@id([productId, categoryId])
 }
 
 model Product {
@@ -109,6 +107,16 @@ model Product {
   productUsers      ProductUser[]
   productCategories ProductCategory[]
   isDeleted         Boolean           @default(false)
+}
+
+model ProductUser {
+  userId     Int
+  productId  Int
+  user       User     @relation(fields: [userId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+  assignedAt DateTime @default(now())
+
+  @@id([userId, productId])
 }
 
 model Variant {
@@ -130,90 +138,120 @@ model VariantValue {
 }
 
 model ProductOption {
-  id                  Int                  @id @default(autoincrement())
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  title               String
-  sku                 String               @default("")
-  amount              Int
-  productId           Int
-  product             Product              @relation(fields: [productId], references: [id])
-  productOptionValues ProductOptionValue[]
-  // orderItems         OrderItem[]
+  id            Int                  @id @default(autoincrement())
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  title         String
+  sku           String               @default("")
+  amount        Int
+  productId     Int
+  product       Product              @relation(fields: [productId], references: [id])
+  weight        Int
+  variantValues ProductOptionValue[]
+  orders        OrderItem[]
+  carts         CartItem[]
+  isDeleted     Boolean              @default(false)
 }
 
 model ProductOptionValue {
-  id              Int           @id @default(autoincrement())
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
   productOptionId Int
   variantValueId  Int
   productOption   ProductOption @relation(fields: [productOptionId], references: [id])
   variantValue    VariantValue  @relation(fields: [variantValueId], references: [id])
+  assignedAt      DateTime      @default(now())
+
+  @@id([productOptionId, variantValueId])
 }
 
-// model OrderStatus {
-//   id          Int      @id @default(autoincrement())
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-//   name        String
-//   isPending   Boolean
-//   isCompleted Boolean
-//   orders      Order[]
-// }
+model Cart {
+  id             Int        @id @default(autoincrement())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  userId         Int        @unique
+  user           User       @relation(fields: [userId], references: [id])
+  productOptions CartItem[]
+  isDeleted      Boolean    @default(false)
+}
 
-// model Coupon {
-//   id        Int      @id @default(autoincrement())
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   start     DateTime
-//   end       DateTime
-//   percent   Int
-//   code      String
-//   orders    Order[]
-// }
+model CartItem {
+  cartId          Int
+  cart            Cart           @relation(fields: [cartId], references: [id])
+  ProductOption   ProductOption? @relation(fields: [productOptionId], references: [id])
+  productOptionId Int
+  quantity        Int
+  assignedAt      DateTime       @default(now())
 
-// model Order {
-//   id        Int      @id @default(autoincrement())
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
+  @@id([cartId, productOptionId])
+}
 
-//   userId        Int
-//   city          String
-//   district      String
-//   ward          String
-//   street        String
-//   totalPrice    String
-//   orderStatusId Int
-//   couponId      Int
-//   orderStatus   OrderStatus @relation(fields: [orderStatusId], references: [id])
-//   coupon        Coupon?     @relation(fields: [couponId], references: [id])
-//   user          User        @relation(fields: [userId], references: [id])
-//   orderItems    OrderItem[]
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  type      String
+  orders    Order[]
+  isDeleted Boolean  @default(false)
+}
 
-// }
+model Coupon {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  start     DateTime
+  end       DateTime
+  code      String
+  percent   Int      @default(0)
+  price     Int      @default(0)
+  orders    Order[]
+  isDeleted Boolean  @default(false)
+}
 
-// model OrderItem {
-//   id              Int           @id @default(autoincrement())
-//   createdAt       DateTime      @default(now())
-//   updatedAt       DateTime      @updatedAt
-//   productOptionId Int
-//   orderId         Int
-//   price           Int
-//   quantity        Int
-//   productOption   ProductOption @relation(fields: [productOptionId], references: [id])
-//   order           Order         @relation(fields: [orderId], references: [id])
-// }
+model Order {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  userId          Int
+  city            String
+  district        String
+  ward            String
+  street          String
+  description     String        @default("")
+  paymentMethodId Int
+  totalPrice      Int
+  shippingPrice   Int           @default(0)
+  orderStatusId   Int
+  couponId        Int?
+  orderStatus     OrderStatus   @relation(fields: [orderStatusId], references: [id])
+  coupon          Coupon?       @relation(fields: [couponId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  orderItems      OrderItem[]
+  isDeleted       Boolean       @default(false)
+}
 
-// model PaymentMethod {
-//   id              Int      @id @default(autoincrement())
-//   createdAt       DateTime @default(now())
-//   updatedAt       DateTime @updatedAt
-//   name            String
-//   requireShipping Boolean
-// }
+model OrderItem {
+  productOptionId Int
+  orderId         Int
+  price           Int
+  quantity        Int
+  productOption   ProductOption @relation(fields: [productOptionId], references: [id])
+  order           Order         @relation(fields: [orderId], references: [id])
+  assignedAt      DateTime      @default(now())
 
-model Media {
+  @@id([productOptionId, orderId])
+}
+
+model PaymentMethod {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  orders    Order[]
+  isDeleted Boolean  @default(false)
+}
+
+model Meta {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -226,12 +264,12 @@ model Banner {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  slug        String   @unique
+  slug        String   @default("")
   description String
   thumbnail   String
   isShow      Boolean  @default(true)
-  mediaId     Int
-  media       Media    @relation(fields: [mediaId], references: [id])
+  metaId      Int
+  meta        Meta     @relation(fields: [metaId], references: [id], onDelete: Cascade)
 }
 
 model Vote {
@@ -291,14 +329,4 @@ model RepComment {
   commentId Int
   user      User     @relation(fields: [userId], references: [id])
   comment   Comment  @relation(fields: [commentId], references: [id])
-}
-
-model ProductUser {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    Int
-  productId Int
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
 }

@@ -32,6 +32,9 @@ export const main = async () => {
   /* SOFT DELETE MIDDLEWARE */
   /***********************************/
   await setDeleted("User");
+  await setDeleted("CategoryType");
+  await setDeleted("Category");
+  await setDeleted("Product");
 };
 
 declare global {

@@ -185,19 +185,15 @@ export const refreshToken = async (
 
     const decoded: any = jwt.verify(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET || "super-secret-1",
+      process.env.RF || "super-serect",
       {
         ignoreExpiration: true,
       }
     );
-
-    const accessToken = jwt.sign(
-      { id: decoded.id, userRoles: decoded.userRoles },
-      process.env.ACCESS_TOKEN_SECRET || "super-secret",
-      {
-        expiresIn: 1 * 60 * 60 * 1000,
-      }
-    );
+    const accessToken = createAccessToken({
+      id: decoded.id,
+      role: decoded.role,
+    });
 
     return {
       status: 201,
@@ -223,6 +219,13 @@ export const getProfile = async (
     const data = await db.user.findUnique({
       where: {
         id: user.id,
+      },
+      include: {
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
       },
     });
     if (data) {

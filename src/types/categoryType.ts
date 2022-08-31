@@ -6,6 +6,6 @@ export interface createCategoryType {
 
 export interface updateCategoryType extends createCategoryType {}
 
-export interface getAllCategoryTypeDto extends QueryItems {
+export interface getAllCategoryType extends QueryItems {
   name?: string;
 }

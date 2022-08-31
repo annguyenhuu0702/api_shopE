@@ -5,12 +5,12 @@ import {
   ResponseType,
   ResponseTypePagination,
 } from "../types/common";
-import { getAllCategoryTypeDto } from "../types/categoryType";
+import { getAllCategoryType } from "../types/categoryType";
 import { db } from "../utils/db.server";
 
 export const categoryType_service = {
   getAll: async (
-    query: getAllCategoryTypeDto
+    query: getAllCategoryType
   ): Promise<ResponseTypePagination<CategoryType[]> | ResponseMessage> => {
     const { p, limit, name } = query;
     try {

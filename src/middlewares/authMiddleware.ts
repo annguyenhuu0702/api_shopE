@@ -8,7 +8,10 @@ export const authMiddlewares = {
       const accessToken = reqHeader.split(" ")[1];
       if (accessToken) {
         try {
-          const user = jwt.verify(accessToken, process.env.AT || "mickey");
+          const user = jwt.verify(
+            accessToken,
+            process.env.AT || "super-serect"
+          );
           res.locals.user = user;
           next();
           return;
@@ -26,7 +29,10 @@ export const authMiddlewares = {
       const accessToken = reqHeader.split(" ")[1];
       if (accessToken) {
         try {
-          const user: any = jwt.verify(accessToken, process.env.AT || "mickey");
+          const user: any = jwt.verify(
+            accessToken,
+            process.env.AT || "super-serect"
+          );
           res.locals.user = user;
           if (user.role === "admin") {
             return next();
