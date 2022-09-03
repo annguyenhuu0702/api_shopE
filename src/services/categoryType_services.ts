@@ -1,17 +1,13 @@
 import { CategoryType } from "@prisma/client";
 import { createCategoryType, updateCategoryType } from "../types/categoryType";
-import {
-  ResponseMessage,
-  ResponseType,
-  ResponseTypePagination,
-} from "../types/common";
+import { responseMessage, responseType, responseData } from "../types/common";
 import { getAllCategoryType } from "../types/categoryType";
 import { db } from "../utils/db.server";
 
 export const categoryType_service = {
   getAll: async (
     query: getAllCategoryType
-  ): Promise<ResponseTypePagination<CategoryType[]> | ResponseMessage> => {
+  ): Promise<responseData<CategoryType[]> | responseMessage> => {
     const { p, limit, name } = query;
     try {
       const data = await db.categoryType.findMany({
@@ -60,7 +56,7 @@ export const categoryType_service = {
   },
   create: async (
     body: createCategoryType
-  ): Promise<ResponseType<CategoryType> | ResponseMessage> => {
+  ): Promise<responseType<CategoryType> | responseMessage> => {
     try {
       const data = await db.categoryType.create({
         data: body,
@@ -79,7 +75,7 @@ export const categoryType_service = {
   update: async (
     body: updateCategoryType,
     id: string
-  ): Promise<ResponseType<CategoryType> | ResponseMessage> => {
+  ): Promise<responseType<CategoryType> | responseMessage> => {
     try {
       const data = await db.categoryType.update({
         where: {
@@ -98,7 +94,7 @@ export const categoryType_service = {
       };
     }
   },
-  delete: async (id: string): Promise<ResponseMessage> => {
+  delete: async (id: string): Promise<responseMessage> => {
     try {
       await db.categoryType.delete({
         where: {

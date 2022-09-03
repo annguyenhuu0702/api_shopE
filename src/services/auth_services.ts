@@ -10,7 +10,7 @@ import {
   registerDto,
   typeAuth,
 } from "../types/auth";
-import { ResponseMessage, ResponseType } from "../types/common";
+import { responseMessage, responseType } from "../types/common";
 import { User } from "../types/user";
 import { db } from "../utils/db.server";
 
@@ -33,7 +33,7 @@ const createRefreshToken = (obj: any) => {
 export const register = async (
   body: registerDto,
   res: Response
-): Promise<ResponseType<typeAuth> | ResponseMessage> => {
+): Promise<responseType<typeAuth> | responseMessage> => {
   try {
     const { email, password, fullname } = body;
     const isEmail = await db.user.findUnique({
@@ -101,7 +101,7 @@ export const register = async (
 export const login = async (
   body: loginDto,
   res: Response
-): Promise<ResponseType<typeAuth> | ResponseMessage> => {
+): Promise<responseType<typeAuth> | responseMessage> => {
   try {
     const { email, password } = body;
     const checkUser = await db.user.findUnique({
@@ -163,7 +163,7 @@ export const login = async (
 
 export const refreshToken = async (
   req: Request
-): Promise<ResponseType<{ accessToken: string }> | ResponseMessage> => {
+): Promise<responseType<{ accessToken: string }> | responseMessage> => {
   try {
     if (!req.cookies) {
       return {
@@ -214,7 +214,7 @@ export const refreshToken = async (
 
 export const getProfile = async (
   user: any
-): Promise<ResponseType<User> | ResponseMessage> => {
+): Promise<responseType<User> | responseMessage> => {
   try {
     const data = await db.user.findUnique({
       where: {
@@ -260,7 +260,7 @@ export const getProfile = async (
 export const changeProfile = async (
   body: changeProfileDto,
   user: any
-): Promise<ResponseMessage> => {
+): Promise<responseMessage> => {
   try {
     await db.user.update({
       where: {
@@ -290,7 +290,7 @@ export const changeProfile = async (
 export const changePassword = async (
   body: changePasswordDto,
   user: any
-): Promise<ResponseMessage> => {
+): Promise<responseMessage> => {
   try {
     const data = await db.user.findFirst({
       where: {
@@ -337,7 +337,7 @@ export const changePassword = async (
 export const changeEmail = async (
   body: changeEmailDto,
   user: any
-): Promise<ResponseMessage> => {
+): Promise<responseMessage> => {
   try {
     await db.user.update({
       where: {

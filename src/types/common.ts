@@ -1,23 +1,23 @@
-export interface BatchPayload {
+export interface batchPayload {
   count: number;
 }
 
-export interface ResponseBatchPayload {
+export interface responseBatchPayload {
   status: number;
-  data: BatchPayload;
+  data: batchPayload;
 }
 
-export interface ResponseMessage {
+export interface responseMessage {
   status: number;
   data: { message: string };
 }
 
-export interface ResponseType<T> {
+export interface responseType<T> {
   status: number;
   data: { data: T | null; message?: string };
 }
 
-export interface ResponseTypePagination<T> {
+export interface responseData<T> {
   status: number;
   data: {
     data: {
@@ -28,19 +28,19 @@ export interface ResponseTypePagination<T> {
   };
 }
 
-export interface ResponseItemsType<T> {
+export interface responseItemsType<T> {
   items: T[];
   totalResult?: number;
   totalPage?: number;
   limit?: number;
 }
 
-export interface ResponseItems<T> {
+export interface responseItems<T> {
   status: number;
   data: T;
 }
 
-export interface QueryItems {
+export interface queryItems {
   limit?: string;
   p?: string;
   all?: string;

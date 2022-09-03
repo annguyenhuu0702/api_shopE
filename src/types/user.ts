@@ -1,4 +1,4 @@
-import { QueryItems } from "./common";
+import { queryItems } from "./common";
 
 export interface User {
   id?: number | string;
@@ -24,7 +24,7 @@ export interface User {
   // userRoles
 }
 
-export interface UserDto {
+export interface userDto {
   email: string;
   password: string;
   avatar: string;
@@ -34,7 +34,7 @@ export interface UserDto {
   gender: boolean;
 }
 
-export interface GetAllUserDto extends QueryItems {
+export interface getAllUser extends queryItems {
   email?: string;
   fullname?: string;
   phone?: string;

@@ -1,18 +1,17 @@
 import { Category } from "@prisma/client";
-import { createCategory, updateCategory } from "../types/category";
-import { getAllCategoryType } from "../types/categoryType";
 import {
-  ResponseMessage,
-  ResponseType,
-  ResponseTypePagination,
-} from "../types/common";
+  createCategory,
+  updateCategory,
+  getAllCategory,
+} from "../types/category";
+import { responseMessage, responseType, responseData } from "../types/common";
 import { db } from "../utils/db.server";
 import { generateIncludeChildrenCategory } from "../utils/index";
 export const category_service = {
   getAll: async (
-    query: getAllCategoryType
-  ): Promise<ResponseTypePagination<Category[]> | ResponseMessage> => {
-    const { p, limit } = query;
+    query: getAllCategory
+  ): Promise<responseData<Category[]> | responseMessage> => {
+    const { p, limit, name, categoryType, parent } = query;
     try {
       const data = await db.category.findMany({
         where: {
@@ -20,6 +19,14 @@ export const category_service = {
           categoryType: {
             isDeleted: false,
           },
+          ...(name
+            ? {
+                name: {
+                  contains: name,
+                  mode: "insensitive",
+                },
+              }
+            : {}),
         },
         include: {
           categoryType: true,
@@ -37,6 +44,9 @@ export const category_service = {
       const count = await db.category.count({
         where: {
           isDeleted: false,
+          categoryType: {
+            isDeleted: false,
+          },
         },
       });
       return {
@@ -61,7 +71,7 @@ export const category_service = {
   },
   create: async (
     body: createCategory
-  ): Promise<ResponseType<Category> | ResponseMessage> => {
+  ): Promise<responseType<Category> | responseMessage> => {
     try {
       const data = await db.category.create({
         data: body,
@@ -85,7 +95,7 @@ export const category_service = {
   update: async (
     body: updateCategory,
     id: string
-  ): Promise<ResponseType<Category> | ResponseMessage> => {
+  ): Promise<responseType<Category> | responseMessage> => {
     try {
       const data = await db.category.update({
         where: {
@@ -109,7 +119,7 @@ export const category_service = {
       };
     }
   },
-  delete: async (id: string): Promise<ResponseMessage> => {
+  delete: async (id: string): Promise<responseMessage> => {
     try {
       await db.category.delete({
         where: {

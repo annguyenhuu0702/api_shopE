@@ -1,4 +1,4 @@
-export interface typeRole {
+export interface role {
   id: string | number;
   createdAt: Date;
   updatedAt: Date;

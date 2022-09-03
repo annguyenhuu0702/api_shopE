@@ -1,4 +1,4 @@
-import { QueryItems } from "./common";
+import { queryItems } from "./common";
 
 export interface createCategoryType {
   name: string;
@@ -6,6 +6,6 @@ export interface createCategoryType {
 
 export interface updateCategoryType extends createCategoryType {}
 
-export interface getAllCategoryType extends QueryItems {
+export interface getAllCategoryType extends queryItems {
   name?: string;
 }

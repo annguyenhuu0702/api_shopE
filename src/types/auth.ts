@@ -12,7 +12,7 @@ export interface loginDto {
 }
 
 export interface typeAuth {
-  user: User | undefined;
+  user: User;
   accessToken: string;
 }
 

@@ -1,16 +1,12 @@
 import * as argon from "argon2";
-import {
-  ResponseMessage,
-  ResponseType,
-  ResponseTypePagination,
-} from "../types/common";
-import { GetAllUserDto, User, UserDto } from "../types/user";
+import { responseMessage, responseType, responseData } from "../types/common";
+import { getAllUser, User, userDto } from "../types/user";
 import { db } from "../utils/db.server";
 
 export const user_services = {
   create: async (
-    body: UserDto
-  ): Promise<ResponseType<User> | ResponseMessage> => {
+    body: userDto
+  ): Promise<responseType<User> | responseMessage> => {
     try {
       const { email, password, ...other } = body;
       const isEmail = await db.user.findUnique({
@@ -90,8 +86,8 @@ export const user_services = {
     }
   },
   getAll: async (
-    query: GetAllUserDto
-  ): Promise<ResponseTypePagination<User[]> | ResponseMessage> => {
+    query: getAllUser
+  ): Promise<responseData<User[]> | responseMessage> => {
     const { p, limit, email, fullname, phone } = query;
     try {
       const users = await db.user.findMany({
@@ -173,9 +169,9 @@ export const user_services = {
     }
   },
   update: async (
-    body: UserDto,
+    body: userDto,
     id: string
-  ): Promise<ResponseType<User> | ResponseMessage> => {
+  ): Promise<responseType<User> | responseMessage> => {
     try {
       const data = await db.user.update({
         where: {
@@ -203,7 +199,7 @@ export const user_services = {
       };
     }
   },
-  delete: async (id: string): Promise<ResponseMessage> => {
+  delete: async (id: string): Promise<responseMessage> => {
     try {
       await db.user.delete({
         where: {
