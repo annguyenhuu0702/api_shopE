@@ -69,6 +69,32 @@ export const category_service = {
       };
     }
   },
+  getById: async (
+    id: string
+  ): Promise<responseType<Category> | responseMessage> => {
+    try {
+      const data = await db.category.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      return {
+        status: 200,
+        data: {
+          data: data,
+          message: "Success",
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        status: 500,
+        data: {
+          message: "Error",
+        },
+      };
+    }
+  },
   create: async (
     body: createCategory
   ): Promise<responseType<Category> | responseMessage> => {

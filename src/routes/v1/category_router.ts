@@ -6,6 +6,7 @@ const router = Router();
 
 router.post("/create", authMiddlewares.verifyAdmin, category_controller.create);
 router.get("/getAll", category_controller.getAll);
+router.get("/getById/:id", category_controller.getById);
 router.put(
   "/update/:id",
   authMiddlewares.verifyAdmin,

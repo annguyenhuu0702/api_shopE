@@ -6,6 +6,10 @@ export const category_controller = {
     const { data, status } = await category_service.getAll(req.query);
     return res.status(status).json(data);
   },
+  getById: async (req: Request, res: Response) => {
+    const { data, status } = await category_service.getById(req.params.id);
+    return res.status(status).json(data);
+  },
   create: async (req: Request, res: Response) => {
     const { status, data } = await category_service.create(req.body);
     return res.status(status).json(data);
