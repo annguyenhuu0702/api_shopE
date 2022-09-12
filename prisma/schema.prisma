@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Role {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   name      String
-  userRoles UserRole[]
-  isDeleted Boolean    @default(false)
+  isDeleted Boolean  @default(false)
+  users     User[]
 }
 
 model User {
@@ -35,24 +35,15 @@ model User {
   phone       String        @default("")
   gender      Boolean       @default(true)
   isDeleted   Boolean       @default(false)
+  role        Role          @relation(fields: [roleId], references: [id])
+  roleId      Int
   orders      Order[]
   votes       Vote[]
   repVotes    RepVote[]
   product     ProductUser[]
   comments    Comment[]
   repComments RepComment[]
-  userRoles   UserRole[]
   Cart        Cart?
-}
-
-model UserRole {
-  userId     Int
-  roleId     Int
-  user       User     @relation(fields: [userId], references: [id])
-  role       Role     @relation(fields: [roleId], references: [id])
-  assignedAt DateTime @default(now())
-
-  @@id([userId, roleId])
 }
 
 model CategoryType {
@@ -71,7 +62,7 @@ model Category {
   title             String
   name              String            @default("")
   description       String            @default("")
-  slug              String            @unique
+  slug              String
   thumbnail         String            @default("")
   categoryTypeId    Int?
   categoryType      CategoryType?     @relation(fields: [categoryTypeId], references: [id])

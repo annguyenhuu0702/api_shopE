@@ -48,46 +48,49 @@ export const register = async (
       };
     }
     const hash = await argon.hash(password);
-    const user = await db.user.create({
-      data: {
-        email,
-        hash,
-        fullname,
+    const role = await db.role.findFirst({
+      where: {
+        name: "user",
       },
     });
-    const userRole = await db.userRole.create({
-      data: {
-        userId: user.id,
-        roleId: 3,
-      },
-      include: {
-        role: true,
-      },
-    });
-    const { hash: _hash, ...others } = user;
-    const accessToken = createAccessToken({
-      id: user.id,
-      role: userRole.role.name,
-    });
+    if (role) {
+      const user = await db.user.create({
+        data: {
+          email,
+          hash,
+          fullname,
+          roleId: role.id,
+        },
+      });
+      const { hash: _hash, ...others } = user;
+      const accessToken = createAccessToken({
+        id: user.id,
+        roleId: user.roleId,
+      });
 
-    const refresh_token = createRefreshToken({
-      id: user.id,
-      role: userRole.role.name,
-    });
+      const refresh_token = createRefreshToken({
+        id: user.id,
+        roleId: user.roleId,
+      });
 
-    res.cookie("REFRESH_TOKEN", refresh_token, {
-      sameSite: "strict",
-      httpOnly: true,
-      secure: false,
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+      res.cookie("REFRESH_TOKEN", refresh_token, {
+        sameSite: "strict",
+        httpOnly: true,
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
 
+      return {
+        status: 201,
+        data: {
+          data: { user: others, accessToken: accessToken },
+          message: "Success",
+        },
+      };
+    }
     return {
-      status: 201,
-      data: {
-        data: { user: others, accessToken: accessToken },
-        message: "Success",
-      },
+      status: 500,
+      data: { message: "Lỗi rồi" },
     };
   } catch (error) {
     console.log(error);
@@ -108,13 +111,6 @@ export const login = async (
       where: {
         email,
       },
-      include: {
-        userRoles: {
-          include: {
-            role: true,
-          },
-        },
-      },
     });
 
     if (!checkUser) {
@@ -133,11 +129,11 @@ export const login = async (
     const { hash: _hash, ...others } = checkUser;
     const accessToken = createAccessToken({
       id: checkUser.id,
-      role: checkUser.userRoles[0].role.name,
+      roleId: checkUser.roleId,
     });
     const refresh_token = createRefreshToken({
       id: checkUser.id,
-      role: checkUser.userRoles[0].role.name,
+      roleId: checkUser.roleId,
     });
     res.cookie("REFRESH_TOKEN", refresh_token, {
       sameSite: "strict",
@@ -192,7 +188,7 @@ export const refreshToken = async (
     );
     const accessToken = createAccessToken({
       id: decoded.id,
-      role: decoded.role,
+      roleId: decoded.roleId,
     });
 
     return {
@@ -219,13 +215,6 @@ export const getProfile = async (
     const data = await db.user.findUnique({
       where: {
         id: user.id,
-      },
-      include: {
-        userRoles: {
-          include: {
-            role: true,
-          },
-        },
       },
     });
     if (data) {

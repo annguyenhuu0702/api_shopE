@@ -28,15 +28,12 @@ export const user_services = {
           email,
         },
       });
-      await db.userRole.create({
-        data: {
-          userId: user.id,
-          roleId: 3,
-        },
-        include: {
-          role: true,
+      const role = await db.role.findFirst({
+        where: {
+          name: "user",
         },
       });
+
       const { hash: _hash, ...others } = user;
       return {
         status: 200,
@@ -93,13 +90,7 @@ export const user_services = {
       const users = await db.user.findMany({
         where: {
           isDeleted: false,
-          userRoles: {
-            every: {
-              role: {
-                name: "user",
-              },
-            },
-          },
+          roleId: 3,
           ...(email
             ? {
                 email: {
@@ -139,13 +130,7 @@ export const user_services = {
       const count = await db.user.count({
         where: {
           isDeleted: false,
-          userRoles: {
-            every: {
-              role: {
-                name: "user",
-              },
-            },
-          },
+          roleId: 3,
         },
       });
       return {

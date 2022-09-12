@@ -27,6 +27,16 @@ export const category_service = {
                 },
               }
             : {}),
+          ...(parent
+            ? {
+                parent: {
+                  name: {
+                    contains: parent,
+                    mode: "insensitive",
+                  },
+                },
+              }
+            : {}),
         },
         include: {
           categoryType: true,

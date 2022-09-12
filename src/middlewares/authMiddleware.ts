@@ -34,7 +34,7 @@ export const authMiddlewares = {
             process.env.AT || "super-serect"
           );
           res.locals.user = user;
-          if (user.role === "admin") {
+          if (user.roleId === 2) {
             return next();
           }
         } catch (error) {

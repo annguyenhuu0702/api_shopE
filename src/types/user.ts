@@ -1,4 +1,5 @@
 import { queryItems } from "./common";
+import { role } from "./role";
 
 export interface User {
   id?: number | string;
@@ -16,12 +17,13 @@ export interface User {
   phone: string;
   isDeleted: boolean;
   gender: boolean;
+  role?: role;
+
   // votes
   // repVotes
   // productUsers
   // comments
   // repComments
-  // userRoles
 }
 
 export interface userDto {
