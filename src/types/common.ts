@@ -43,9 +43,9 @@ export interface responseItems<T> {
 export interface queryItems {
   limit?: string;
   p?: string;
+  q?: string;
   all?: string;
   depth?: string;
   sortBy?: string;
   sortType?: string;
-  q?: string;
 }

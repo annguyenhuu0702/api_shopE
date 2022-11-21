@@ -21,16 +21,17 @@ export const user_services = {
         };
       }
       const hash = await argon.hash(password);
+      const role = await db.role.findFirst({
+        where: {
+          name: "user",
+        },
+      });
       const user = await db.user.create({
         data: {
           ...other,
           hash,
           email,
-        },
-      });
-      const role = await db.role.findFirst({
-        where: {
-          name: "user",
+          roleId: role?.id,
         },
       });
 

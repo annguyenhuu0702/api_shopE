@@ -142,7 +142,7 @@ export const login = async (
       maxAge: 24 * 60 * 60 * 1000,
     });
     return {
-      status: 201,
+      status: 200,
       data: {
         data: { user: others, accessToken: accessToken },
         message: "Success",
@@ -307,7 +307,7 @@ export const changePassword = async (
       }
     }
     return {
-      status: 400,
+      status: 500,
       data: {
         message: "Error!",
       },
